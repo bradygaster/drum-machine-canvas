@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FM Drum Machine</title>
+<style>
+  :root {
+    --bg: var(--background-color-default, #0d1117);
+    --fg: var(--text-color-default, #e6edf3);
+    --muted: var(--text-color-muted, #8b949e);
+    --border: var(--border-color-default, #30363d);
+    --accent: var(--true-color-blue, #4493f8);
+    --accent-muted: var(--true-color-blue-muted, #1f6feb);
+    --red: var(--true-color-red, #f85149);
+    --panel: #161b22;
+    --cell: #21262d;
+    --cell-on: #4493f8;
+    --cell-beat: #2d333b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: 14px; }
+  h1 {
+    font-size: 26px; font-weight: 600; margin: 0 0 4px;
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; max-width: 70ch; }
+
+  .transport {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 12px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px;
+  }
+  button {
+    font-family: inherit; font-size: 13px;
+    background: var(--cell); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 7px;
+    padding: 7px 12px; cursor: pointer; transition: all .12s;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent-muted); border-color: var(--accent); color: #fff; font-weight: 600; }
+  button.primary.playing { background: var(--red); border-color: var(--red); }
+  button.ghost { background: transparent; }
+  .ctl { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .ctl input[type=number] {
+    width: 58px; background: var(--cell); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: 5px 7px; font-family: inherit; font-size: 13px;
+  }
+  .ctl input[type=range] { width: 90px; accent-color: var(--accent); }
+  .spacer { flex: 1; }
+
+  .grid-wrap {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px; overflow-x: auto; margin-bottom: 14px;
+  }
+  table.grid { border-collapse: separate; border-spacing: 4px; }
+  table.grid td { padding: 0; }
+  .track-label {
+    white-space: nowrap; padding-right: 10px; cursor: pointer;
+    user-select: none; min-width: 92px;
+  }
+  .track-label .name { font-weight: 600; }
+  .track-label .name.sel { color: var(--accent); }
+  .track-label .hint { color: var(--muted); font-size: 10px; }
+  .step {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--cell); border: 1px solid var(--border);
+    cursor: pointer; transition: background .06s, transform .06s;
+  }
+  .step.beat { background: var(--cell-beat); }
+  .step.on { background: var(--cell-on); border-color: var(--cell-on); }
+  .step.playhead { box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--accent); }
+  .step:active { transform: scale(.9); }
+  .mute-btn {
+    width: 22px; height: 22px; border-radius: 5px; padding: 0; font-size: 11px; line-height: 1;
+    margin-left: 6px;
+  }
+  .mute-btn.muted { background: var(--red); border-color: var(--red); color: #fff; }
+
+  .editor {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .editor h2 { font-size: 14px; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; }
+  .editor h2 .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); }
+  .editor .sub2 { color: var(--muted); font-size: 11px; margin-bottom: 12px; }
+  .params { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 10px 22px; }
+  .param { display: flex; flex-direction: column; gap: 3px; }
+  .param .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .param label { font-size: 12px; }
+  .param .val { color: var(--accent); font-variant-numeric: tabular-nums; font-size: 12px; }
+  .param input[type=range] { width: 100%; accent-color: var(--accent); }
+  .param .desc { color: var(--muted); font-size: 10px; }
+  .editor-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .toast {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent-muted); color: #fff; padding: 8px 14px;
+    border-radius: 8px; font-size: 12px; opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  select {
+    font-family: inherit; font-size: 13px; background: var(--cell); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px;
+  }
+</style>
+</head>
+<body>
+  <h1>🥁 FM Drum Machine</h1>
+  <div class="sub">Pure frequency-modulation synthesis — every sound is generated live, no samples. Click steps to build patterns, pick a track to sculpt its tone.</div>
+
+  <div class="transport">
+    <button id="play" class="primary">▶ Play</button>
+    <button id="clear" class="ghost">Clear</button>
+    <div class="ctl">BPM
+      <input id="bpm" type="number" min="40" max="300" value="120" />
+    </div>
+    <div class="ctl">Swing
+      <input id="swing" type="range" min="0" max="60" value="0" />
+      <span id="swingVal" style="width:34px;display:inline-block">0%</span>
+    </div>
+    <div class="ctl">Master
+      <input id="master" type="range" min="0" max="100" value="80" />
+    </div>
+    <div class="spacer"></div>
+    <div class="ctl">Kit
+      <select id="kit">
+        <option value="">— patterns —</option>
+        <option value="fourfloor">Four on the floor</option>
+        <option value="boombap">Boom bap</option>
+        <option value="breakbeat">Breakbeat</option>
+        <option value="techno">Techno</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid-wrap">
+    <table class="grid"><tbody id="gridBody"></tbody></table>
+  </div>
+
+  <div class="editor">
+    <h2><span class="swatch" id="edSwatch"></span><span id="edName">Track</span> — FM voice</h2>
+    <div class="sub2" id="edSub">Carrier + modulator FM with a pitch & amp envelope.</div>
+    <div class="params" id="params"></div>
+    <div class="editor-actions">
+      <button id="audition">🔊 Audition</button>
+      <button id="resetVoice" class="ghost">Reset voice</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const STEPS = 16;
+const $ = (s) => document.querySelector(s);
+
+// ---- FM voice parameter definitions (shown in the editor) ----
+const PARAM_DEFS = [
+  { key: "carrier",   label: "Carrier freq",   min: 20,  max: 2000, step: 1,    unit: "Hz",  desc: "Base pitch of the voice." },
+  { key: "ratio",     label: "Mod ratio",      min: 0.1, max: 12,   step: 0.1,  unit: "×",   desc: "Modulator freq = carrier × ratio." },
+  { key: "index",     label: "FM index",       min: 0,   max: 1500, step: 1,    unit: "",    desc: "Modulation depth — the grit/metallic character." },
+  { key: "indexDecay",label: "Mod decay",      min: 0.005,max: 1.2, step: 0.005,unit: "s",   desc: "How fast the FM index falls." },
+  { key: "pitchEnv",  label: "Pitch drop",     min: 0,   max: 2000, step: 1,    unit: "Hz",  desc: "Extra start pitch that sweeps down (punch)." },
+  { key: "pitchDecay",label: "Pitch decay",    min: 0.005,max: 1.0, step: 0.005,unit: "s",   desc: "Speed of the pitch sweep." },
+  { key: "ampDecay",  label: "Amp decay",      min: 0.01, max: 2.0, step: 0.01, unit: "s",   desc: "Length of the note." },
+  { key: "noise",     label: "Noise mix",      min: 0,   max: 100,  step: 1,    unit: "%",   desc: "Blend in filtered noise (snares/hats)." },
+  { key: "noiseHP",   label: "Noise tone",     min: 100, max: 12000,step: 50,   unit: "Hz",  desc: "High-pass cutoff for the noise." },
+  { key: "gain",      label: "Level",          min: 0,   max: 100,  step: 1,    unit: "%",   desc: "Per-track volume." },
+];
+
+// ---- Default tracks: classic drum voices done with FM ----
+function defaultTracks() {
+  return [
+    { name: "Kick",  color: "#f0883e", v: { carrier: 55,  ratio: 0.5, index: 8,   indexDecay: 0.04, pitchEnv: 280, pitchDecay: 0.06, ampDecay: 0.45, noise: 0,  noiseHP: 100,  gain: 95 } },
+    { name: "Snare", color: "#f85149", v: { carrier: 190, ratio: 1.6, index: 120, indexDecay: 0.05, pitchEnv: 90,  pitchDecay: 0.03, ampDecay: 0.22, noise: 70, noiseHP: 1400, gain: 80 } },
+    { name: "Clap",  color: "#db61a2", v: { carrier: 320, ratio: 2.1, index: 60,  indexDecay: 0.03, pitchEnv: 0,   pitchDecay: 0.02, ampDecay: 0.18, noise: 85, noiseHP: 1100, gain: 72 } },
+    { name: "Tom",   color: "#a371f7", v: { carrier: 120, ratio: 1.0, index: 18,  indexDecay: 0.08, pitchEnv: 160, pitchDecay: 0.10, ampDecay: 0.40, noise: 0,  noiseHP: 200,  gain: 78 } },
+    { name: "ClHat", color: "#2dd4bf", v: { carrier: 800, ratio: 4.7, index: 200, indexDecay: 0.02, pitchEnv: 0,   pitchDecay: 0.02, ampDecay: 0.06, noise: 60, noiseHP: 7000, gain: 60 } },
+    { name: "OpHat", color: "#56d364", v: { carrier: 820, ratio: 4.7, index: 200, indexDecay: 0.05, pitchEnv: 0,   pitchDecay: 0.02, ampDecay: 0.35, noise: 55, noiseHP: 7000, gain: 58 } },
+    { name: "Cow",   color: "#e3b341", v: { carrier: 540, ratio: 1.48,index: 40,  indexDecay: 0.2,  pitchEnv: 0,   pitchDecay: 0.02, ampDecay: 0.30, noise: 0,  noiseHP: 100,  gain: 64 } },
+    { name: "Zap",   color: "#79c0ff", v: { carrier: 440, ratio: 3.3, index: 600, indexDecay: 0.15, pitchEnv: 600, pitchDecay: 0.20, ampDecay: 0.30, noise: 0,  noiseHP: 100,  gain: 66 } },
+  ];
+}
+
+const PATTERNS = {
+  fourfloor: { Kick:[0,4,8,12], ClHat:[2,6,10,14], OpHat:[], Snare:[4,12], Clap:[] },
+  boombap:   { Kick:[0,10], Snare:[4,12], ClHat:[0,2,4,6,8,10,12,14], OpHat:[14] },
+  breakbeat: { Kick:[0,6,9], Snare:[4,12], ClHat:[2,5,8,11,14], OpHat:[] },
+  techno:    { Kick:[0,4,8,12], ClHat:[2,6,10,14], OpHat:[2,6,10,14], Clap:[4,12], Zap:[7,15] },
+};
+
+// ---- State ----
+let state = null;     // { bpm, swing, master, tracks:[{name,color,v,steps:[],mute}], selected }
+let audio = null;     // AudioContext
+let masterGain = null;
+let playing = false;
+let curStep = 0;
+let nextNoteTime = 0;
+let timerId = null;
+let lastSavedJSON = "";
+
+function blankSteps() { return new Array(STEPS).fill(false); }
+
+function freshState() {
+  const tracks = defaultTracks().map(t => ({ ...t, v: { ...t.v }, steps: blankSteps(), mute: false }));
+  return { bpm: 120, swing: 0, master: 80, selected: 0, tracks };
+}
+
+// ---- Persistence via the extension server ----
+async function loadState() {
+  try {
+    const r = await fetch("state");
+    if (r.ok) {
+      const data = await r.json();
+      if (data && data.tracks && data.tracks.length) return migrate(data);
+    }
+  } catch (e) {}
+  return freshState();
+}
+function migrate(data) {
+  // Ensure all tracks have all params & step arrays of right length.
+  const def = Object.fromEntries(defaultTracks().map(t => [t.name, t]));
+  data.tracks.forEach(t => {
+    const base = def[t.name]?.v || {};
+    t.v = { ...base, ...(t.v || {}) };
+    if (!Array.isArray(t.steps)) t.steps = blankSteps();
+    if (t.steps.length < STEPS) t.steps = t.steps.concat(blankSteps().slice(t.steps.length));
+    t.mute = !!t.mute;
+  });
+  if (typeof data.selected !== "number") data.selected = 0;
+  return data;
+}
+let saveTimer = null;
+function saveState() {
+  const json = JSON.stringify(state);
+  if (json === lastSavedJSON) return;
+  lastSavedJSON = json;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch("state", { method: "POST", headers: { "Content-Type": "application/json" }, body: json }).catch(() => {});
+  }, 250);
+}
+
+// ================= AUDIO: FM synthesis =================
+function ensureAudio() {
+  if (!audio) {
+    audio = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audio.createGain();
+    masterGain.gain.value = state.master / 100;
+    masterGain.connect(audio.destination);
+  }
+  if (audio.state === "suspended") audio.resume();
+}
+
+let noiseBuffer = null;
+function getNoise() {
+  if (noiseBuffer) return noiseBuffer;
+  const len = audio.sampleRate * 1.5;
+  noiseBuffer = audio.createBuffer(1, len, audio.sampleRate);
+  const d = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  return noiseBuffer;
+}
+
+// The heart of it: a two-operator FM voice with pitch, index and amp envelopes.
+function playVoice(v, when, gainScale = 1) {
+  const t = when;
+  const ampDecay = Math.max(0.01, v.ampDecay);
+
+  // --- amp envelope ---
+  const amp = audio.createGain();
+  const peak = (v.gain / 100) * gainScale;
+  amp.gain.setValueAtTime(0.0001, t);
+  amp.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + 0.002);
+  amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.002 + ampDecay);
+  amp.connect(masterGain);
+
+  // --- carrier oscillator ---
+  const carrier = audio.createOscillator();
+  carrier.type = "sine";
+  const baseFreq = v.carrier;
+  // pitch envelope: start high, sweep down to base (gives punch / toms / zaps)
+  const startFreq = baseFreq + v.pitchEnv;
+  carrier.frequency.setValueAtTime(Math.max(20, startFreq), t);
+  if (v.pitchEnv > 0) {
+    carrier.frequency.exponentialRampToValueAtTime(Math.max(20, baseFreq), t + Math.max(0.005, v.pitchDecay));
+  }
+
+  // --- modulator oscillator (the FM part) ---
+  const mod = audio.createOscillator();
+  mod.type = "sine";
+  mod.frequency.setValueAtTime(Math.max(0.01, baseFreq * v.ratio), t);
+  if (v.pitchEnv > 0) {
+    mod.frequency.exponentialRampToValueAtTime(Math.max(0.01, baseFreq * v.ratio), t + Math.max(0.005, v.pitchDecay));
+  }
+  // modulation index envelope -> scales how much the modulator deviates the carrier
+  const modGain = audio.createGain();
+  const idxStart = v.index * baseFreq * 0.0; // we express index directly in Hz deviation below
+  const peakDev = v.index; // Hz of frequency deviation
+  modGain.gain.setValueAtTime(peakDev, t);
+  modGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, peakDev * 0.001 + 0.0001), t + Math.max(0.005, v.indexDecay));
+  mod.connect(modGain);
+  modGain.connect(carrier.frequency);
+  carrier.connect(amp);
+
+  carrier.start(t); mod.start(t);
+  const stop = t + 0.005 + ampDecay + 0.05;
+  carrier.stop(stop); mod.stop(stop);
+
+  // --- noise layer ---
+  if (v.noise > 0) {
+    const ns = audio.createBufferSource();
+    ns.buffer = getNoise();
+    const hp = audio.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.value = v.noiseHP;
+    const ng = audio.createGain();
+    const npeak = (v.noise / 100) * (v.gain / 100) * gainScale;
+    ng.gain.setValueAtTime(0.0001, t);
+    ng.gain.exponentialRampToValueAtTime(Math.max(0.0002, npeak), t + 0.002);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.002 + ampDecay * 0.9);
+    ns.connect(hp); hp.connect(ng); ng.connect(masterGain);
+    ns.start(t); ns.stop(t + 0.005 + ampDecay + 0.05);
+  }
+}
+
+// ================= SEQUENCER (lookahead scheduler) =================
+const LOOKAHEAD = 0.1;     // seconds of audio to schedule ahead
+const INTERVAL = 25;       // ms scheduler tick
+
+function stepDur() { return (60 / state.bpm) / 4; } // 16th notes
+
+function scheduler() {
+  while (nextNoteTime < audio.currentTime + LOOKAHEAD) {
+    scheduleStep(curStep, nextNoteTime);
+    advance();
+  }
+}
+function advance() {
+  let dur = stepDur();
+  // swing: delay odd 16ths
+  if (curStep % 2 === 1) dur += stepDur() * (state.swing / 100);
+  else dur -= stepDur() * (state.swing / 100) * 0; // keep grid; only push odd
+  nextNoteTime += dur;
+  curStep = (curStep + 1) % STEPS;
+}
+function scheduleStep(step, when) {
+  state.tracks.forEach(t => {
+    if (t.mute) return;
+    if (t.steps[step]) playVoice(t.v, when);
+  });
+  // visual playhead
+  const drawAt = when - audio.currentTime;
+  setTimeout(() => highlight(step), Math.max(0, drawAt * 1000));
+}
+
+function start() {
+  ensureAudio();
+  playing = true;
+  curStep = 0;
+  nextNoteTime = audio.currentTime + 0.05;
+  timerId = setInterval(scheduler, INTERVAL);
+  $("#play").classList.add("playing");
+  $("#play").textContent = "■ Stop";
+}
+function stop() {
+  playing = false;
+  clearInterval(timerId);
+  $("#play").classList.remove("playing");
+  $("#play").textContent = "▶ Play";
+  document.querySelectorAll(".step.playhead").forEach(e => e.classList.remove("playhead"));
+}
+
+// ================= RENDER =================
+function renderGrid() {
+  const body = $("#gridBody");
+  body.innerHTML = "";
+  state.tracks.forEach((t, ti) => {
+    const tr = document.createElement("tr");
+
+    const labelTd = document.createElement("td");
+    labelTd.className = "track-label";
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex"; wrap.style.alignItems = "center";
+    const txt = document.createElement("div");
+    txt.innerHTML = `<div class="name ${ti===state.selected?'sel':''}" style="color:${ti===state.selected?t.color:''}">${t.name}</div><div class="hint">${Math.round(t.v.carrier)}Hz · r${t.v.ratio}</div>`;
+    txt.style.cursor = "pointer";
+    txt.onclick = () => { state.selected = ti; renderAll(); saveState(); };
+    const mute = document.createElement("button");
+    mute.className = "mute-btn" + (t.mute ? " muted" : "");
+    mute.textContent = t.mute ? "M" : "M";
+    mute.title = "Mute";
+    mute.onclick = (e) => { e.stopPropagation(); t.mute = !t.mute; renderGrid(); saveState(); };
+    wrap.appendChild(txt); wrap.appendChild(mute);
+    labelTd.appendChild(wrap);
+    tr.appendChild(labelTd);
+
+    for (let s = 0; s < STEPS; s++) {
+      const td = document.createElement("td");
+      const cell = document.createElement("div");
+      cell.className = "step" + (s % 4 === 0 ? " beat" : "") + (t.steps[s] ? " on" : "");
+      cell.dataset.track = ti; cell.dataset.step = s;
+      if (t.steps[s]) cell.style.background = t.color, cell.style.borderColor = t.color;
+      cell.onclick = () => {
+        t.steps[s] = !t.steps[s];
+        if (t.steps[s]) { ensureAudio(); playVoice(t.v, audio.currentTime + 0.001); }
+        renderGrid(); saveState();
+      };
+      td.appendChild(cell);
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  });
+}
+
+function highlight(step) {
+  document.querySelectorAll(".step.playhead").forEach(e => e.classList.remove("playhead"));
+  document.querySelectorAll(`.step[data-step="${step}"]`).forEach(e => e.classList.add("playhead"));
+}
+
+function renderEditor() {
+  const t = state.tracks[state.selected];
+  $("#edName").textContent = t.name;
+  $("#edSwatch").style.background = t.color;
+  $("#edSub").textContent = `Two-operator FM voice. Carrier ${Math.round(t.v.carrier)}Hz · ratio ${t.v.ratio} · index ${Math.round(t.v.index)}.`;
+  const box = $("#params");
+  box.innerHTML = "";
+  PARAM_DEFS.forEach(def => {
+    const val = t.v[def.key];
+    const el = document.createElement("div");
+    el.className = "param";
+    el.innerHTML = `
+      <div class="row"><label>${def.label}</label><span class="val">${fmt(val)}${def.unit}</span></div>
+      <input type="range" min="${def.min}" max="${def.max}" step="${def.step}" value="${val}" />
+      <div class="desc">${def.desc}</div>`;
+    const slider = el.querySelector("input");
+    const valSpan = el.querySelector(".val");
+    slider.oninput = () => {
+      t.v[def.key] = parseFloat(slider.value);
+      valSpan.textContent = fmt(t.v[def.key]) + def.unit;
+      if (def.key === "carrier" || def.key === "ratio") { renderGrid(); }
+      saveState();
+    };
+    slider.onchange = () => { ensureAudio(); playVoice(t.v, audio.currentTime + 0.001); };
+    box.appendChild(el);
+  });
+}
+function fmt(n) {
+  if (n >= 100) return Math.round(n).toString();
+  if (Number.isInteger(n)) return n.toString();
+  return (Math.round(n * 100) / 100).toString();
+}
+
+function renderAll() { renderGrid(); renderEditor(); }
+
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1400);
+}
+
+// ================= WIRING =================
+function wire() {
+  $("#play").onclick = () => { ensureAudio(); playing ? stop() : start(); };
+  $("#clear").onclick = () => {
+    state.tracks.forEach(t => t.steps = blankSteps());
+    renderGrid(); saveState(); toast("Pattern cleared");
+  };
+  $("#bpm").onchange = () => { state.bpm = clamp(+$("#bpm").value, 40, 300); $("#bpm").value = state.bpm; saveState(); };
+  $("#swing").oninput = () => { state.swing = +$("#swing").value; $("#swingVal").textContent = state.swing + "%"; saveState(); };
+  $("#master").oninput = () => { state.master = +$("#master").value; if (masterGain) masterGain.gain.value = state.master/100; saveState(); };
+  $("#audition").onclick = () => { ensureAudio(); playVoice(state.tracks[state.selected].v, audio.currentTime + 0.001); };
+  $("#resetVoice").onclick = () => {
+    const def = defaultTracks().find(d => d.name === state.tracks[state.selected].name);
+    if (def) { state.tracks[state.selected].v = { ...def.v }; renderAll(); saveState(); toast("Voice reset"); }
+  };
+  $("#kit").onchange = () => {
+    const p = PATTERNS[$("#kit").value];
+    if (p) {
+      state.tracks.forEach(t => {
+        t.steps = blankSteps();
+        if (p[t.name]) p[t.name].forEach(i => t.steps[i] = true);
+      });
+      renderGrid(); saveState(); toast("Loaded: " + $("#kit").selectedOptions[0].text);
+    }
+    $("#kit").value = "";
+  };
+}
+function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+
+// ================= BOOT =================
+(async function init() {
+  state = await loadState();
+  lastSavedJSON = JSON.stringify(state);
+  $("#bpm").value = state.bpm;
+  $("#swing").value = state.swing; $("#swingVal").textContent = state.swing + "%";
+  $("#master").value = state.master;
+  wire();
+  renderAll();
+})();
+</script>
+</body>
+</html>
