@@ -6,6 +6,13 @@ modulation** (Web Audio) — there are no samples anywhere.
 
 ![sequencer](https://img.shields.io/badge/synthesis-FM-blue) ![no samples](https://img.shields.io/badge/samples-none-success)
 
+![FM Drum Machine running](media/demo.gif)
+
+> Running a techno pattern — the highlighted column is the playhead stepping through
+> 16th notes while every voice is synthesized live via FM.
+
+![FM Drum Machine interface](media/screenshot.png)
+
 ## What it does
 
 - **16-step sequencer** across 8 drum voices (Kick, Snare, Clap, Tom, Closed/Open
