@@ -35,10 +35,12 @@
   }
   .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; max-width: 70ch; }
 
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 14px;
+  }
   .transport {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    padding: 10px 12px; background: var(--panel);
-    border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px;
   }
   button {
     font-family: inherit; font-size: 13px;
@@ -58,18 +60,11 @@
   .ctl input[type=range] { width: 90px; accent-color: var(--accent); }
   .spacer { flex: 1; }
 
-  .grid-wrap {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px; overflow-x: auto; margin-bottom: 14px;
-  }
+  .grid-wrap { padding: 10px; overflow-x: auto; }
   table.grid { border-collapse: separate; border-spacing: 4px; }
   table.grid td { padding: 0; }
-  .track-label {
-    white-space: nowrap; padding-right: 10px; cursor: pointer;
-    user-select: none; min-width: 92px;
-  }
+  .track-label { white-space: nowrap; padding-right: 10px; user-select: none; min-width: 92px; }
   .track-label .name { font-weight: 600; }
-  .track-label .name.sel { color: var(--accent); }
   .track-label .hint { color: var(--muted); font-size: 10px; }
   .step {
     width: 30px; height: 30px; border-radius: 6px;
@@ -80,19 +75,13 @@
   .step.on { background: var(--cell-on); border-color: var(--cell-on); }
   .step.playhead { box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--accent); }
   .step:active { transform: scale(.9); }
-  .mute-btn {
-    width: 22px; height: 22px; border-radius: 5px; padding: 0; font-size: 11px; line-height: 1;
-    margin-left: 6px;
-  }
+  .mute-btn { width: 22px; height: 22px; border-radius: 5px; padding: 0; font-size: 11px; line-height: 1; margin-left: 6px; }
   .mute-btn.muted { background: var(--red); border-color: var(--red); color: #fff; }
 
-  .editor {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 14px;
-  }
-  .editor h2 { font-size: 14px; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; }
-  .editor h2 .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); }
-  .editor .sub2 { color: var(--muted); font-size: 11px; margin-bottom: 12px; }
+  .section-head { padding: 10px 14px 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .section-head .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); }
+  .editor { padding: 4px 14px 14px; }
+  .editor .sub2 { color: var(--muted); font-size: 11px; margin: 2px 0 12px; }
   .params { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 10px 22px; }
   .param { display: flex; flex-direction: column; gap: 3px; }
   .param .row { display: flex; justify-content: space-between; align-items: baseline; }
@@ -101,36 +90,51 @@
   .param input[type=range] { width: 100%; accent-color: var(--accent); }
   .param .desc { color: var(--muted); font-size: 10px; }
   .editor-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* LFO panel */
+  .lfo-panel { padding: 4px 14px 12px; }
+  .lfo-row {
+    display: grid;
+    grid-template-columns: 34px 1.1fr 1.1fr 1fr 1.4fr 1.4fr;
+    align-items: center; gap: 10px;
+    padding: 8px 0; border-top: 1px solid var(--border);
+  }
+  .lfo-row:first-of-type { border-top: none; }
+  .lfo-row .field { display: flex; flex-direction: column; gap: 2px; }
+  .lfo-row .field span { font-size: 10px; color: var(--muted); }
+  .lfo-row .field .vlabel { color: var(--accent); }
+  .lfo-row input[type=range] { width: 100%; accent-color: var(--accent); }
+  .lfo-row.off { opacity: .45; }
+  .switch { width: 34px; height: 20px; border-radius: 10px; background: var(--cell); border: 1px solid var(--border); position: relative; cursor: pointer; }
+  .switch.on { background: var(--accent-muted); border-color: var(--accent); }
+  .switch .knob { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: left .12s; }
+  .switch.on .knob { left: 16px; }
+
+  select {
+    font-family: inherit; font-size: 12px; background: var(--cell); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 6px; padding: 5px 7px;
+  }
   .toast {
     position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
     background: var(--accent-muted); color: #fff; padding: 8px 14px;
-    border-radius: 8px; font-size: 12px; opacity: 0; transition: opacity .2s; pointer-events: none;
+    border-radius: 8px; font-size: 12px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10;
   }
   .toast.show { opacity: 1; }
-  select {
-    font-family: inherit; font-size: 13px; background: var(--cell); color: var(--fg);
-    border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px;
-  }
+  .agent-pill { font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; }
 </style>
 </head>
 <body>
   <h1>🥁 FM Drum Machine</h1>
-  <div class="sub">Pure frequency-modulation synthesis — every sound is generated live, no samples. Click steps to build patterns, pick a track to sculpt its tone.</div>
+  <div class="sub">Pure frequency-modulation synthesis: every sound is generated live, no samples. Build patterns, sculpt each voice, route LFOs into the modulation, or just ask the agent for a beat.</div>
 
-  <div class="transport">
+  <div class="panel transport">
     <button id="play" class="primary">▶ Play</button>
     <button id="clear" class="ghost">Clear</button>
-    <div class="ctl">BPM
-      <input id="bpm" type="number" min="40" max="300" value="120" />
-    </div>
-    <div class="ctl">Swing
-      <input id="swing" type="range" min="0" max="60" value="0" />
-      <span id="swingVal" style="width:34px;display:inline-block">0%</span>
-    </div>
-    <div class="ctl">Master
-      <input id="master" type="range" min="0" max="100" value="80" />
-    </div>
+    <div class="ctl">BPM <input id="bpm" type="number" min="40" max="300" value="120" /></div>
+    <div class="ctl">Swing <input id="swing" type="range" min="0" max="60" value="0" /><span id="swingVal" style="width:34px;display:inline-block">0%</span></div>
+    <div class="ctl">Master <input id="master" type="range" min="0" max="100" value="80" /></div>
     <div class="spacer"></div>
+    <span class="agent-pill" id="agentPill">agent-controllable</span>
     <div class="ctl">Kit
       <select id="kit">
         <option value="">— patterns —</option>
@@ -138,21 +142,29 @@
         <option value="boombap">Boom bap</option>
         <option value="breakbeat">Breakbeat</option>
         <option value="techno">Techno</option>
+        <option value="liquid">Liquid DnB</option>
       </select>
     </div>
   </div>
 
-  <div class="grid-wrap">
+  <div class="panel grid-wrap">
     <table class="grid"><tbody id="gridBody"></tbody></table>
   </div>
 
-  <div class="editor">
-    <h2><span class="swatch" id="edSwatch"></span><span id="edName">Track</span> — FM voice</h2>
-    <div class="sub2" id="edSub">Carrier + modulator FM with a pitch & amp envelope.</div>
-    <div class="params" id="params"></div>
-    <div class="editor-actions">
-      <button id="audition">🔊 Audition</button>
-      <button id="resetVoice" class="ghost">Reset voice</button>
+  <div class="panel">
+    <div class="section-head"><span>🌊 LFOs</span><span style="font-size:11px;color:var(--muted);font-weight:400">— route a low-frequency oscillator into any voice's modulation</span></div>
+    <div class="lfo-panel" id="lfoPanel"></div>
+  </div>
+
+  <div class="panel">
+    <div class="section-head"><span class="swatch" id="edSwatch"></span><span id="edName">Track</span><span style="font-size:11px;color:var(--muted);font-weight:400">— FM voice</span></div>
+    <div class="editor">
+      <div class="sub2" id="edSub">Carrier + modulator FM with a pitch & amp envelope.</div>
+      <div class="params" id="params"></div>
+      <div class="editor-actions">
+        <button id="audition">🔊 Audition</button>
+        <button id="resetVoice" class="ghost">Reset voice</button>
+      </div>
     </div>
   </div>
 
@@ -162,7 +174,6 @@
 const STEPS = 16;
 const $ = (s) => document.querySelector(s);
 
-// ---- FM voice parameter definitions (shown in the editor) ----
 const PARAM_DEFS = [
   { key: "carrier",   label: "Carrier freq",   min: 20,  max: 2000, step: 1,    unit: "Hz",  desc: "Base pitch of the voice." },
   { key: "ratio",     label: "Mod ratio",      min: 0.1, max: 12,   step: 0.1,  unit: "×",   desc: "Modulator freq = carrier × ratio." },
@@ -176,7 +187,16 @@ const PARAM_DEFS = [
   { key: "gain",      label: "Level",          min: 0,   max: 100,  step: 1,    unit: "%",   desc: "Per-track volume." },
 ];
 
-// ---- Default tracks: classic drum voices done with FM ----
+// LFO target params -> { label, range for depth slider }
+const LFO_TARGETS = {
+  index:   { label: "FM index",   min: 0, max: 1000, step: 1,   unit: "" },
+  pitch:   { label: "Pitch (Hz)", min: 0, max: 1000, step: 1,   unit: "Hz" },
+  ratio:   { label: "Mod ratio",  min: 0, max: 6,    step: 0.05,unit: "×" },
+  noiseHP: { label: "Noise tone", min: 0, max: 6000, step: 25,  unit: "Hz" },
+  gain:    { label: "Level",      min: 0, max: 1,    step: 0.01,unit: "" },
+};
+const LFO_WAVES = ["sine", "triangle", "square", "sawtooth", "random"];
+
 function defaultTracks() {
   return [
     { name: "Kick",  color: "#f0883e", v: { carrier: 55,  ratio: 0.5, index: 8,   indexDecay: 0.04, pitchEnv: 280, pitchDecay: 0.06, ampDecay: 0.45, noise: 0,  noiseHP: 100,  gain: 95 } },
@@ -189,51 +209,59 @@ function defaultTracks() {
     { name: "Zap",   color: "#79c0ff", v: { carrier: 440, ratio: 3.3, index: 600, indexDecay: 0.15, pitchEnv: 600, pitchDecay: 0.20, ampDecay: 0.30, noise: 0,  noiseHP: 100,  gain: 66 } },
   ];
 }
+function defaultLFOs() {
+  return [
+    { on: false, track: "All", param: "index",   wave: "sine",     rate: 0.5, depth: 0 },
+    { on: false, track: "All", param: "noiseHP", wave: "triangle", rate: 2,   depth: 0 },
+    { on: false, track: "All", param: "pitch",   wave: "sine",     rate: 4,   depth: 0 },
+  ];
+}
 
 const PATTERNS = {
-  fourfloor: { Kick:[0,4,8,12], ClHat:[2,6,10,14], OpHat:[], Snare:[4,12], Clap:[] },
+  fourfloor: { Kick:[0,4,8,12], ClHat:[2,6,10,14], Snare:[4,12] },
   boombap:   { Kick:[0,10], Snare:[4,12], ClHat:[0,2,4,6,8,10,12,14], OpHat:[14] },
-  breakbeat: { Kick:[0,6,9], Snare:[4,12], ClHat:[2,5,8,11,14], OpHat:[] },
+  breakbeat: { Kick:[0,6,9], Snare:[4,12], ClHat:[2,5,8,11,14] },
   techno:    { Kick:[0,4,8,12], ClHat:[2,6,10,14], OpHat:[2,6,10,14], Clap:[4,12], Zap:[7,15] },
+  liquid:    { Kick:[0,10], Snare:[4,12], ClHat:[2,3,6,8,11,14,15], OpHat:[6], Zap:[] },
 };
 
-// ---- State ----
-let state = null;     // { bpm, swing, master, tracks:[{name,color,v,steps:[],mute}], selected }
-let audio = null;     // AudioContext
-let masterGain = null;
-let playing = false;
-let curStep = 0;
-let nextNoteTime = 0;
-let timerId = null;
+let state = null;
+let audio = null, masterGain = null;
+let lfoMaster = [];      // master LFO nodes [{ source, bus, slot }]
+let playing = false, curStep = 0, nextNoteTime = 0, timerId = null;
 let lastSavedJSON = "";
 
 function blankSteps() { return new Array(STEPS).fill(false); }
-
 function freshState() {
   const tracks = defaultTracks().map(t => ({ ...t, v: { ...t.v }, steps: blankSteps(), mute: false }));
-  return { bpm: 120, swing: 0, master: 80, selected: 0, tracks };
+  return { bpm: 120, swing: 0, master: 80, selected: 0, tracks, lfos: defaultLFOs() };
 }
 
-// ---- Persistence via the extension server ----
+// ---------- persistence ----------
 async function loadState() {
   try {
     const r = await fetch("state");
-    if (r.ok) {
-      const data = await r.json();
-      if (data && data.tracks && data.tracks.length) return migrate(data);
-    }
+    if (r.ok) { const data = await r.json(); if (data && data.tracks) return migrate(data); }
   } catch (e) {}
   return freshState();
 }
 function migrate(data) {
-  // Ensure all tracks have all params & step arrays of right length.
   const def = Object.fromEntries(defaultTracks().map(t => [t.name, t]));
-  data.tracks.forEach(t => {
+  (data.tracks || []).forEach(t => {
     const base = def[t.name]?.v || {};
     t.v = { ...base, ...(t.v || {}) };
     if (!Array.isArray(t.steps)) t.steps = blankSteps();
     if (t.steps.length < STEPS) t.steps = t.steps.concat(blankSteps().slice(t.steps.length));
     t.mute = !!t.mute;
+  });
+  if (!Array.isArray(data.lfos)) data.lfos = defaultLFOs();
+  data.lfos = data.lfos.slice(0, 3);
+  while (data.lfos.length < 3) data.lfos.push(defaultLFOs()[data.lfos.length]);
+  data.lfos.forEach(l => {
+    if (!LFO_TARGETS[l.param]) l.param = "index";
+    if (!LFO_WAVES.includes(l.wave)) l.wave = "sine";
+    l.on = !!l.on; l.rate = +l.rate || 1; l.depth = +l.depth || 0;
+    if (typeof l.track !== "string") l.track = "All";
   });
   if (typeof data.selected !== "number") data.selected = 0;
   return data;
@@ -246,16 +274,17 @@ function saveState() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     fetch("state", { method: "POST", headers: { "Content-Type": "application/json" }, body: json }).catch(() => {});
-  }, 250);
+  }, 200);
 }
 
-// ================= AUDIO: FM synthesis =================
+// ================= AUDIO =================
 function ensureAudio() {
   if (!audio) {
     audio = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audio.createGain();
     masterGain.gain.value = state.master / 100;
     masterGain.connect(audio.destination);
+    buildLFOs();
   }
   if (audio.state === "suspended") audio.resume();
 }
@@ -270,157 +299,181 @@ function getNoise() {
   return noiseBuffer;
 }
 
-// The heart of it: a two-operator FM voice with pitch, index and amp envelopes.
-function playVoice(v, when, gainScale = 1) {
+// Build free-running master LFO buses, each emitting a [-1,1] signal.
+function teardownLFOs() {
+  lfoMaster.forEach(m => { try { m.source.stop(); } catch (e) {} try { m.source.disconnect(); m.bus.disconnect(); } catch (e) {} });
+  lfoMaster = [];
+}
+function buildLFOs() {
+  if (!audio) return;
+  teardownLFOs();
+  const t0 = audio.currentTime;
+  state.lfos.forEach((lfo, slot) => {
+    const bus = audio.createGain();
+    bus.gain.value = 1;
+    let source;
+    if (lfo.wave === "random") {
+      // Sample & hold: a ConstantSource stepped with random values at the LFO rate.
+      source = audio.createConstantSource();
+      const step = 1 / Math.max(0.02, lfo.rate);
+      let tt = t0;
+      for (let i = 0; i < 2000; i++) { source.offset.setValueAtTime(Math.random() * 2 - 1, tt); tt += step; if (tt > t0 + 240) break; }
+      source.connect(bus);
+    } else {
+      source = audio.createOscillator();
+      source.type = lfo.wave;
+      source.frequency.value = Math.max(0.02, lfo.rate);
+      source.connect(bus);
+    }
+    source.start(t0);
+    lfoMaster.push({ source, bus, slot });
+  });
+}
+function rebuildLFOs() { if (audio) buildLFOs(); }
+
+// Connect any enabled LFOs targeting this track to the live voice nodes.
+function connectLFOs(trackName, when, nodes) {
+  // nodes: { modGain, carrierFreq, modFreq, hpFreq, ampGain, baseFreq, ratio, hasNoise, stop }
+  state.lfos.forEach((lfo, slot) => {
+    if (!lfo.on || lfo.depth <= 0) return;
+    if (lfo.track !== "All" && lfo.track !== trackName) return;
+    const m = lfoMaster[slot];
+    if (!m) return;
+    let target = null, scale = lfo.depth;
+    switch (lfo.param) {
+      case "index":   target = nodes.modGain; break;
+      case "pitch":   target = nodes.carrierFreq; break;
+      case "ratio":   target = nodes.modFreq; scale = lfo.depth * nodes.baseFreq; break;
+      case "noiseHP": if (!nodes.hasNoise) return; target = nodes.hpFreq; break;
+      case "gain":    target = nodes.ampGain; break;
+    }
+    if (!target) return;
+    const scaler = audio.createGain();
+    scaler.gain.value = scale;
+    m.bus.connect(scaler);
+    scaler.connect(target);
+    nodes.stop.push(() => { try { scaler.disconnect(); m.bus.disconnect(scaler); } catch (e) {} });
+  });
+}
+
+function playVoice(v, when, trackName) {
   const t = when;
   const ampDecay = Math.max(0.01, v.ampDecay);
+  const stopFns = [];
 
-  // --- amp envelope ---
   const amp = audio.createGain();
-  const peak = (v.gain / 100) * gainScale;
+  const peak = (v.gain / 100);
   amp.gain.setValueAtTime(0.0001, t);
   amp.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + 0.002);
   amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.002 + ampDecay);
   amp.connect(masterGain);
 
-  // --- carrier oscillator ---
   const carrier = audio.createOscillator();
   carrier.type = "sine";
   const baseFreq = v.carrier;
-  // pitch envelope: start high, sweep down to base (gives punch / toms / zaps)
   const startFreq = baseFreq + v.pitchEnv;
   carrier.frequency.setValueAtTime(Math.max(20, startFreq), t);
-  if (v.pitchEnv > 0) {
-    carrier.frequency.exponentialRampToValueAtTime(Math.max(20, baseFreq), t + Math.max(0.005, v.pitchDecay));
-  }
+  if (v.pitchEnv > 0) carrier.frequency.exponentialRampToValueAtTime(Math.max(20, baseFreq), t + Math.max(0.005, v.pitchDecay));
 
-  // --- modulator oscillator (the FM part) ---
   const mod = audio.createOscillator();
   mod.type = "sine";
   mod.frequency.setValueAtTime(Math.max(0.01, baseFreq * v.ratio), t);
-  if (v.pitchEnv > 0) {
-    mod.frequency.exponentialRampToValueAtTime(Math.max(0.01, baseFreq * v.ratio), t + Math.max(0.005, v.pitchDecay));
-  }
-  // modulation index envelope -> scales how much the modulator deviates the carrier
   const modGain = audio.createGain();
-  const idxStart = v.index * baseFreq * 0.0; // we express index directly in Hz deviation below
-  const peakDev = v.index; // Hz of frequency deviation
+  const peakDev = v.index;
   modGain.gain.setValueAtTime(peakDev, t);
   modGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, peakDev * 0.001 + 0.0001), t + Math.max(0.005, v.indexDecay));
   mod.connect(modGain);
   modGain.connect(carrier.frequency);
   carrier.connect(amp);
 
-  carrier.start(t); mod.start(t);
-  const stop = t + 0.005 + ampDecay + 0.05;
-  carrier.stop(stop); mod.stop(stop);
-
-  // --- noise layer ---
+  let hp = null, ns = null;
   if (v.noise > 0) {
-    const ns = audio.createBufferSource();
+    ns = audio.createBufferSource();
     ns.buffer = getNoise();
-    const hp = audio.createBiquadFilter();
+    hp = audio.createBiquadFilter();
     hp.type = "highpass";
     hp.frequency.value = v.noiseHP;
     const ng = audio.createGain();
-    const npeak = (v.noise / 100) * (v.gain / 100) * gainScale;
+    const npeak = (v.noise / 100) * (v.gain / 100);
     ng.gain.setValueAtTime(0.0001, t);
     ng.gain.exponentialRampToValueAtTime(Math.max(0.0002, npeak), t + 0.002);
     ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.002 + ampDecay * 0.9);
     ns.connect(hp); hp.connect(ng); ng.connect(masterGain);
-    ns.start(t); ns.stop(t + 0.005 + ampDecay + 0.05);
   }
+
+  // wire LFOs into the live params
+  connectLFOs(trackName, t, {
+    modGain: modGain.gain, carrierFreq: carrier.frequency, modFreq: mod.frequency,
+    hpFreq: hp ? hp.frequency : null, ampGain: amp.gain,
+    baseFreq, ratio: v.ratio, hasNoise: !!hp, stop: stopFns,
+  });
+
+  carrier.start(t); mod.start(t);
+  if (ns) ns.start(t);
+  const stop = t + 0.005 + ampDecay + 0.05;
+  carrier.stop(stop); mod.stop(stop);
+  if (ns) ns.stop(stop);
+  carrier.onended = () => stopFns.forEach(fn => fn());
 }
 
-// ================= SEQUENCER (lookahead scheduler) =================
-const LOOKAHEAD = 0.1;     // seconds of audio to schedule ahead
-const INTERVAL = 25;       // ms scheduler tick
-
-function stepDur() { return (60 / state.bpm) / 4; } // 16th notes
-
-function scheduler() {
-  while (nextNoteTime < audio.currentTime + LOOKAHEAD) {
-    scheduleStep(curStep, nextNoteTime);
-    advance();
-  }
-}
+// ================= SEQUENCER =================
+const LOOKAHEAD = 0.1, INTERVAL = 25;
+function stepDur() { return (60 / state.bpm) / 4; }
+function scheduler() { while (nextNoteTime < audio.currentTime + LOOKAHEAD) { scheduleStep(curStep, nextNoteTime); advance(); } }
 function advance() {
   let dur = stepDur();
-  // swing: delay odd 16ths
   if (curStep % 2 === 1) dur += stepDur() * (state.swing / 100);
-  else dur -= stepDur() * (state.swing / 100) * 0; // keep grid; only push odd
   nextNoteTime += dur;
   curStep = (curStep + 1) % STEPS;
 }
 function scheduleStep(step, when) {
-  state.tracks.forEach(t => {
-    if (t.mute) return;
-    if (t.steps[step]) playVoice(t.v, when);
-  });
-  // visual playhead
-  const drawAt = when - audio.currentTime;
-  setTimeout(() => highlight(step), Math.max(0, drawAt * 1000));
+  state.tracks.forEach(t => { if (!t.mute && t.steps[step]) playVoice(t.v, when, t.name); });
+  const drawAt = (when - audio.currentTime) * 1000;
+  setTimeout(() => highlight(step), Math.max(0, drawAt));
 }
-
 function start() {
   ensureAudio();
-  playing = true;
-  curStep = 0;
-  nextNoteTime = audio.currentTime + 0.05;
+  playing = true; curStep = 0; nextNoteTime = audio.currentTime + 0.05;
   timerId = setInterval(scheduler, INTERVAL);
-  $("#play").classList.add("playing");
-  $("#play").textContent = "■ Stop";
+  $("#play").classList.add("playing"); $("#play").textContent = "■ Stop";
 }
 function stop() {
-  playing = false;
-  clearInterval(timerId);
-  $("#play").classList.remove("playing");
-  $("#play").textContent = "▶ Play";
+  playing = false; clearInterval(timerId);
+  $("#play").classList.remove("playing"); $("#play").textContent = "▶ Play";
   document.querySelectorAll(".step.playhead").forEach(e => e.classList.remove("playhead"));
 }
 
 // ================= RENDER =================
 function renderGrid() {
-  const body = $("#gridBody");
-  body.innerHTML = "";
+  const body = $("#gridBody"); body.innerHTML = "";
   state.tracks.forEach((t, ti) => {
     const tr = document.createElement("tr");
-
     const labelTd = document.createElement("td");
     labelTd.className = "track-label";
-    const wrap = document.createElement("div");
-    wrap.style.display = "flex"; wrap.style.alignItems = "center";
+    const wrap = document.createElement("div"); wrap.style.display = "flex"; wrap.style.alignItems = "center";
     const txt = document.createElement("div");
-    txt.innerHTML = `<div class="name ${ti===state.selected?'sel':''}" style="color:${ti===state.selected?t.color:''}">${t.name}</div><div class="hint">${Math.round(t.v.carrier)}Hz · r${t.v.ratio}</div>`;
+    txt.innerHTML = `<div class="name" style="color:${ti===state.selected?t.color:''}">${t.name}</div><div class="hint">${Math.round(t.v.carrier)}Hz · r${t.v.ratio}</div>`;
     txt.style.cursor = "pointer";
     txt.onclick = () => { state.selected = ti; renderAll(); saveState(); };
     const mute = document.createElement("button");
-    mute.className = "mute-btn" + (t.mute ? " muted" : "");
-    mute.textContent = t.mute ? "M" : "M";
-    mute.title = "Mute";
+    mute.className = "mute-btn" + (t.mute ? " muted" : ""); mute.textContent = "M"; mute.title = "Mute";
     mute.onclick = (e) => { e.stopPropagation(); t.mute = !t.mute; renderGrid(); saveState(); };
-    wrap.appendChild(txt); wrap.appendChild(mute);
-    labelTd.appendChild(wrap);
-    tr.appendChild(labelTd);
-
+    wrap.appendChild(txt); wrap.appendChild(mute); labelTd.appendChild(wrap); tr.appendChild(labelTd);
     for (let s = 0; s < STEPS; s++) {
       const td = document.createElement("td");
       const cell = document.createElement("div");
       cell.className = "step" + (s % 4 === 0 ? " beat" : "") + (t.steps[s] ? " on" : "");
       cell.dataset.track = ti; cell.dataset.step = s;
-      if (t.steps[s]) cell.style.background = t.color, cell.style.borderColor = t.color;
+      if (t.steps[s]) { cell.style.background = t.color; cell.style.borderColor = t.color; }
       cell.onclick = () => {
         t.steps[s] = !t.steps[s];
-        if (t.steps[s]) { ensureAudio(); playVoice(t.v, audio.currentTime + 0.001); }
         renderGrid(); saveState();
       };
-      td.appendChild(cell);
-      tr.appendChild(td);
+      td.appendChild(cell); tr.appendChild(td);
     }
     body.appendChild(tr);
   });
 }
-
 function highlight(step) {
   document.querySelectorAll(".step.playhead").forEach(e => e.classList.remove("playhead"));
   document.querySelectorAll(`.step[data-step="${step}"]`).forEach(e => e.classList.add("playhead"));
@@ -431,53 +484,95 @@ function renderEditor() {
   $("#edName").textContent = t.name;
   $("#edSwatch").style.background = t.color;
   $("#edSub").textContent = `Two-operator FM voice. Carrier ${Math.round(t.v.carrier)}Hz · ratio ${t.v.ratio} · index ${Math.round(t.v.index)}.`;
-  const box = $("#params");
-  box.innerHTML = "";
+  const box = $("#params"); box.innerHTML = "";
   PARAM_DEFS.forEach(def => {
     const val = t.v[def.key];
-    const el = document.createElement("div");
-    el.className = "param";
-    el.innerHTML = `
-      <div class="row"><label>${def.label}</label><span class="val">${fmt(val)}${def.unit}</span></div>
+    const el = document.createElement("div"); el.className = "param";
+    el.innerHTML = `<div class="row"><label>${def.label}</label><span class="val">${fmt(val)}${def.unit}</span></div>
       <input type="range" min="${def.min}" max="${def.max}" step="${def.step}" value="${val}" />
       <div class="desc">${def.desc}</div>`;
-    const slider = el.querySelector("input");
-    const valSpan = el.querySelector(".val");
+    const slider = el.querySelector("input"); const valSpan = el.querySelector(".val");
     slider.oninput = () => {
       t.v[def.key] = parseFloat(slider.value);
       valSpan.textContent = fmt(t.v[def.key]) + def.unit;
-      if (def.key === "carrier" || def.key === "ratio") { renderGrid(); }
+      if (def.key === "carrier" || def.key === "ratio") renderGrid();
       saveState();
     };
-    slider.onchange = () => { ensureAudio(); playVoice(t.v, audio.currentTime + 0.001); };
     box.appendChild(el);
   });
 }
-function fmt(n) {
-  if (n >= 100) return Math.round(n).toString();
-  if (Number.isInteger(n)) return n.toString();
-  return (Math.round(n * 100) / 100).toString();
+
+function renderLFOs() {
+  const panel = $("#lfoPanel"); panel.innerHTML = "";
+  const trackOpts = ["All", ...state.tracks.map(t => t.name)];
+  state.lfos.forEach((lfo, i) => {
+    const tgt = LFO_TARGETS[lfo.param];
+    const row = document.createElement("div");
+    row.className = "lfo-row" + (lfo.on ? "" : " off");
+    row.innerHTML = `
+      <div class="switch ${lfo.on ? "on" : ""}" data-act="toggle"><div class="knob"></div></div>
+      <div class="field"><span>Track</span>
+        <select data-act="track">${trackOpts.map(o => `<option ${o===lfo.track?"selected":""}>${o}</option>`).join("")}</select></div>
+      <div class="field"><span>Target</span>
+        <select data-act="param">${Object.entries(LFO_TARGETS).map(([k,d]) => `<option value="${k}" ${k===lfo.param?"selected":""}>${d.label}</option>`).join("")}</select></div>
+      <div class="field"><span>Wave</span>
+        <select data-act="wave">${LFO_WAVES.map(w => `<option ${w===lfo.wave?"selected":""}>${w}</option>`).join("")}</select></div>
+      <div class="field"><span>Rate <b class="vlabel">${lfo.rate.toFixed(2)}Hz</b></span>
+        <input type="range" data-act="rate" min="0.05" max="20" step="0.05" value="${lfo.rate}" /></div>
+      <div class="field"><span>Depth <b class="vlabel">${fmt(lfo.depth)}${tgt.unit}</b></span>
+        <input type="range" data-act="depth" min="${tgt.min}" max="${tgt.max}" step="${tgt.step}" value="${Math.min(lfo.depth, tgt.max)}" /></div>`;
+    row.querySelector('[data-act="toggle"]').onclick = () => { lfo.on = !lfo.on; renderLFOs(); rebuildLFOs(); saveState(); };
+    row.querySelector('[data-act="track"]').onchange = (e) => { lfo.track = e.target.value; saveState(); };
+    row.querySelector('[data-act="param"]').onchange = (e) => { lfo.param = e.target.value; lfo.depth = Math.min(lfo.depth, LFO_TARGETS[lfo.param].max); renderLFOs(); saveState(); };
+    row.querySelector('[data-act="wave"]').onchange = (e) => { lfo.wave = e.target.value; rebuildLFOs(); saveState(); };
+    const rate = row.querySelector('[data-act="rate"]');
+    rate.oninput = () => { lfo.rate = parseFloat(rate.value); row.querySelector('.field:nth-child(5) .vlabel').textContent = lfo.rate.toFixed(2)+"Hz"; saveState(); };
+    rate.onchange = () => rebuildLFOs();
+    const depth = row.querySelector('[data-act="depth"]');
+    depth.oninput = () => { lfo.depth = parseFloat(depth.value); row.querySelector('.field:nth-child(6) .vlabel').textContent = fmt(lfo.depth)+tgt.unit; saveState(); };
+    panel.appendChild(row);
+  });
 }
 
-function renderAll() { renderGrid(); renderEditor(); }
+function fmt(n) { if (n >= 100) return Math.round(n).toString(); if (Number.isInteger(n)) return n.toString(); return (Math.round(n * 100) / 100).toString(); }
+function renderAll() { renderGrid(); renderEditor(); renderLFOs(); syncTransport(); }
+function syncTransport() {
+  $("#bpm").value = state.bpm;
+  $("#swing").value = state.swing; $("#swingVal").textContent = state.swing + "%";
+  $("#master").value = state.master; if (masterGain) masterGain.gain.value = state.master/100;
+}
+function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1600); }
 
-function toast(msg) {
-  const el = $("#toast");
-  el.textContent = msg; el.classList.add("show");
-  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 1400);
+// ================= LIVE (agent) =================
+function applyRemoteState(newState) {
+  const json = JSON.stringify(newState);
+  if (json === lastSavedJSON) return;
+  state = migrate(newState);
+  lastSavedJSON = JSON.stringify(state);
+  renderAll(); rebuildLFOs();
+  toast("Updated by agent");
+}
+function connectEvents() {
+  try {
+    const es = new EventSource("events");
+    es.onmessage = (e) => {
+      let msg; try { msg = JSON.parse(e.data); } catch { return; }
+      if (msg.type === "state" && msg.state) applyRemoteState(msg.state);
+      else if (msg.type === "transport") { ensureAudio(); if (msg.action === "play" && !playing) start(); else if (msg.action === "stop" && playing) stop(); }
+      else if (msg.type === "audition") { ensureAudio(); const tr = state.tracks.find(t => t.name === msg.track); if (tr) playVoice(tr.v, audio.currentTime + 0.001, tr.name); }
+    };
+    es.onerror = () => {};
+  } catch (e) {}
 }
 
 // ================= WIRING =================
 function wire() {
   $("#play").onclick = () => { ensureAudio(); playing ? stop() : start(); };
-  $("#clear").onclick = () => {
-    state.tracks.forEach(t => t.steps = blankSteps());
-    renderGrid(); saveState(); toast("Pattern cleared");
-  };
+  $("#clear").onclick = () => { state.tracks.forEach(t => t.steps = blankSteps()); renderGrid(); saveState(); toast("Pattern cleared"); };
   $("#bpm").onchange = () => { state.bpm = clamp(+$("#bpm").value, 40, 300); $("#bpm").value = state.bpm; saveState(); };
   $("#swing").oninput = () => { state.swing = +$("#swing").value; $("#swingVal").textContent = state.swing + "%"; saveState(); };
   $("#master").oninput = () => { state.master = +$("#master").value; if (masterGain) masterGain.gain.value = state.master/100; saveState(); };
-  $("#audition").onclick = () => { ensureAudio(); playVoice(state.tracks[state.selected].v, audio.currentTime + 0.001); };
+  $("#audition").onclick = () => { ensureAudio(); const t = state.tracks[state.selected]; playVoice(t.v, audio.currentTime + 0.001, t.name); };
   $("#resetVoice").onclick = () => {
     const def = defaultTracks().find(d => d.name === state.tracks[state.selected].name);
     if (def) { state.tracks[state.selected].v = { ...def.v }; renderAll(); saveState(); toast("Voice reset"); }
@@ -485,10 +580,7 @@ function wire() {
   $("#kit").onchange = () => {
     const p = PATTERNS[$("#kit").value];
     if (p) {
-      state.tracks.forEach(t => {
-        t.steps = blankSteps();
-        if (p[t.name]) p[t.name].forEach(i => t.steps[i] = true);
-      });
+      state.tracks.forEach(t => { t.steps = blankSteps(); if (p[t.name]) p[t.name].forEach(i => t.steps[i] = true); });
       renderGrid(); saveState(); toast("Loaded: " + $("#kit").selectedOptions[0].text);
     }
     $("#kit").value = "";
@@ -496,15 +588,10 @@ function wire() {
 }
 function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 
-// ================= BOOT =================
 (async function init() {
   state = await loadState();
   lastSavedJSON = JSON.stringify(state);
-  $("#bpm").value = state.bpm;
-  $("#swing").value = state.swing; $("#swingVal").textContent = state.swing + "%";
-  $("#master").value = state.master;
-  wire();
-  renderAll();
+  wire(); renderAll(); connectEvents();
 })();
 </script>
 </body>
